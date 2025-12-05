@@ -15,7 +15,7 @@ export default function PetCard({ pet }) {
       <div className="p-4">
         <h2 className="text-xl font-bold">{pet.name}</h2>
         <p className="text-gray-600 capitalize">{pet.type}</p>
-        <p className="text-gray-700 mt-2 line-clamp-2">{pet.description}</p>
+<p className="text-gray-700 mt-2">{pet.description}</p>
 
         {/* Buttons */}
         <div className="mt-4 flex justify-between items-center">

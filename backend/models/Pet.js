@@ -1,16 +1,11 @@
-import express from "express";
-import Pet from "../models/Pet.js";
+import mongoose from "mongoose";
 
-const router = express.Router();
-
-router.get("/", async (req, res) => {
-  try {
-    const pets = await Pet.find();
-    res.json(pets);
-  } catch (error) {
-    console.log("PETS ERROR:", error);
-    res.status(500).json({ msg: "Error fetching pets" });
-  }
+const PetSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  type: { type: String, required: true },
+  age: { type: Number, required: true },
+  description: { type: String, required: true },
+  image: { type: String, required: true }
 });
 
-export default router;
+export default mongoose.model("Pet", PetSchema);

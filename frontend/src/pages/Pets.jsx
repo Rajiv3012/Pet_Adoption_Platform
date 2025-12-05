@@ -7,14 +7,16 @@ export default function Pets() {
   const [loading, setLoading] = useState(true);
 
   const loadPets = async () => {
-    try {
-      const res = await api.get("/pets");
-      setPets(res.data);
-    } catch (err) {
-      console.log("Error loading pets:", err);
-    }
-    setLoading(false);
-  };
+  try {
+    const res = await api.get("/pets");
+    console.log("PETS FROM BACKEND:", res.data);
+    setPets(res.data);
+  } catch (err) {
+    console.log("Error loading pets:", err);
+  }
+  setLoading(false);
+};
+
 
   useEffect(() => {
     loadPets();
