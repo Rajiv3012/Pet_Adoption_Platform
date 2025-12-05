@@ -1,16 +1,18 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  if (!user) {
-    return <h1 className="text-2xl text-center mt-10 text-red-600">Access Denied</h1>;
-  }
+  useEffect(() => {
+    if (!user) navigate("/login");
+  }, [user]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Welcome, {user.name}</h1>
+    <div className="p-10">
+      <h1 className="text-3xl font-bold">Dashboard</h1>
     </div>
   );
 }

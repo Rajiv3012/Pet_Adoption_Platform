@@ -6,24 +6,55 @@ export default function Header() {
   const { user, logout } = useContext(AuthContext);
 
   return (
-    <header className="w-full bg-blue-600 text-white py-4 px-6 shadow-md flex justify-between items-center">
-      <h1 className="text-2xl font-bold">Pet Adoption</h1>
+    <header className="bg-blue-700 text-white py-4 shadow">
+      <nav className="container mx-auto flex justify-between items-center px-4">
 
-      <nav className="space-x-6">
-        <Link className="hover:text-yellow-300" to="/">Home</Link>
-        <Link className="hover:text-yellow-300" to="/pets">Pets</Link>
+        {/* Logo */}
+        <Link to="/" className="text-2xl font-bold">
+          Pet Adoption
+        </Link>
 
-        {!user ? (
-          <>
-            <Link className="hover:text-yellow-300" to="/login">Login</Link>
-            <Link className="hover:text-yellow-300" to="/register">Register</Link>
-          </>
-        ) : (
-          <>
-            <Link className="hover:text-yellow-300" to="/dashboard">Dashboard</Link>
-            <button className="hover:text-yellow-300" onClick={logout}>Logout</button>
-          </>
-        )}
+        {/* Navigation Links */}
+        <div className="flex items-center space-x-6">
+
+          <Link to="/" className="hover:text-gray-200">
+            Home
+          </Link>
+
+          <Link to="/pets" className="hover:text-gray-200">
+            Pets
+          </Link>
+
+          {/* AUTH AREA */}
+          {user ? (
+            <>
+              {/* Show logged-in username */}
+              <span className="font-semibold text-yellow-300">
+                Hi, {user.name}
+              </span>
+
+              {/* Logout button */}
+              <button
+                onClick={logout}
+                className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Show only when user is NOT logged in */}
+              <Link to="/login" className="hover:text-gray-200">
+                Login
+              </Link>
+
+              <Link to="/register" className="hover:text-gray-200">
+                Register
+              </Link>
+            </>
+          )}
+        </div>
+
       </nav>
     </header>
   );

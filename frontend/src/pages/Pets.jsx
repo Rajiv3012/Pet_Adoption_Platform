@@ -6,39 +6,45 @@ export default function Pets() {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadPets() {
-      try {
-        const res = await api.get("/pets");
-        setPets(res.data);
-      } catch (err) {
-        console.error("Error loading pets:", err);
-      } finally {
-        setLoading(false);
-      }
+  const loadPets = async () => {
+    try {
+      const res = await api.get("/pets");
+      setPets(res.data);
+    } catch (err) {
+      console.log("Error loading pets:", err);
     }
+    setLoading(false);
+  };
 
+  useEffect(() => {
     loadPets();
   }, []);
 
-  if (loading) return <h1 className="text-2xl text-center mt-10">Loading pets...</h1>;
-
-  if (pets.length === 0)
+  if (loading) {
     return (
-      <h1 className="text-2xl text-center mt-10 text-gray-500">
-        No pets available right now.
-      </h1>
+      <div className="min-h-screen flex items-center justify-center text-xl font-semibold">
+        Loading pets...
+      </div>
     );
+  }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Available Pets</h1>
+    <div className="container mx-auto px-6 py-10">
+      <h1 className="text-4xl font-bold mb-6 text-center text-blue-700">
+        Available Pets
+      </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {pets.map((pet) => (
-          <PetCard key={pet._id} pet={pet} />
-        ))}
-      </div>
+      {pets.length === 0 ? (
+        <p className="text-center text-gray-600 text-lg">
+          No pets available right now.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {pets.map((pet) => (
+            <PetCard key={pet._id} pet={pet} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
