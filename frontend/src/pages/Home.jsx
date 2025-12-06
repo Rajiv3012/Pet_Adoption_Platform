@@ -3,12 +3,12 @@ export default function Home() {
     <div className="w-full min-h-screen bg-gray-50">
 
       {/* HERO SECTION */}
-      <section className="bg-blue-600 text-white py-20">
+      <section className="bg-red-600 text-white py-20">
         <div className="max-w-6xl mx-auto text-center px-4">
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
             Find Your Perfect Companion
           </h1>
-          <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto mb-6">
+          <p className="text-lg md:text-xl text-red-100 max-w-2xl mx-auto mb-6">
             Adopt a loving pet from shelters near you. Give them a home, gain a friend for life.
           </p>
 
@@ -83,12 +83,12 @@ export default function Home() {
       </section>
 
       {/* CTA SECTION */}
-      <section className="bg-blue-700 text-white py-16 mt-10">
+      <section className="bg-red-700 text-white py-16 mt-10">
         <div className="max-w-6xl mx-auto text-center px-4">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Make a Difference?
           </h2>
-          <p className="text-blue-200 max-w-2xl mx-auto mb-6">
+          <p className="text-red-200 max-w-2xl mx-auto mb-6">
             Become a volunteer or donate to help pets in shelters get a better life.
           </p>
 
