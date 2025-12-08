@@ -1,35 +1,41 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/client";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);   // ✅ Use global context
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    setError("");
+
+    if (!email || !password) {
+      setError("All fields are required");
+      return;
+    }
+
     try {
-      setError("");
+      const res = await api.post("/auth/login", { email, password });
 
-      if (!email || !password) {
-        setError("All fields are required");
-        return;
-      }
+      console.log("LOGIN RESPONSE:", res.data);
 
-      const res = await api.post("/auth/login", {
-        email,
-        password,
-      });
+      // 🔥 USE CONTEXT LOGIN — this fixes header update without refresh
+      login(res.data.user, res.data.token);
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
-      navigate("/dashboard");
+      navigate("/");
     } catch (err) {
-      console.log(err);
-      setError("Invalid email or password");
+      console.log("FRONTEND LOGIN ERROR:", err);
+
+      if (err.response?.data?.msg) {
+        setError(err.response.data.msg);
+      } else {
+        setError("Something went wrong. Try again.");
+      }
     }
   };
 

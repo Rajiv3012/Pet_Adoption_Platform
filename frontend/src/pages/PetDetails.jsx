@@ -1,102 +1,119 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/client";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function PetDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [msg, setMsg] = useState("");
-
-  const { user } = useContext(AuthContext || {}); // if you have AuthContext
-
-  // form fields
-  const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
   const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    const load = async () => {
+    const loadPet = async () => {
       try {
         const res = await api.get(`/pets/${id}`);
         setPet(res.data);
       } catch (err) {
-        console.error("Error loading pet:", err);
+        console.log("Error loading pet:", err);
       }
       setLoading(false);
     };
-    load();
+
+    loadPet();
   }, [id]);
 
-  const handleRequest = async () => {
-    if (!name || !email) {
-      setMsg("Name and email are required.");
+  const sendRequest = async () => {
+    if (!user) {
+      navigate("/login");
       return;
     }
+
     setSending(true);
-    setMsg("");
+
     try {
       const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
       const res = await api.post(
         "/adoption-requests",
-        { pet: id, name, email, message },
-        { headers }
+        { petId: id, message },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
-      setMsg(res.data.msg || "Request sent");
+
+      alert("Request sent successfully!");
       setShowForm(false);
       setMessage("");
     } catch (err) {
-      console.error("Request error:", err);
-      setMsg(err?.response?.data?.msg || "Could not send request");
-    } finally {
-      setSending(false);
+      console.log(err);
+      alert("Failed to send request");
     }
+
+    setSending(false);
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (!pet) return <div className="min-h-screen flex items-center justify-center">Pet not found</div>;
+  if (loading) return <div className="p-10">Loading...</div>;
+  if (!pet) return <div className="p-10">Pet not found</div>;
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-4">
-      <div className="bg-white rounded shadow overflow-hidden md:flex">
-        <img src={pet.image || "https://via.placeholder.com/600x400"} alt={pet.name} className="w-full md:w-1/2 h-80 object-cover" />
-        <div className="p-6 md:w-1/2">
-          <h1 className="text-3xl font-bold mb-2">{pet.name}</h1>
-          <p className="text-gray-600 mb-4">{pet.type} • Age: {pet.age}</p>
-          <p className="text-gray-800 mb-6">{pet.description}</p>
+    <div className="max-w-3xl mx-auto py-10 px-5">
+      <img src={pet.image} className="w-full h-80 object-cover rounded mb-6" />
+      <h1 className="text-4xl font-bold mb-2">{pet.name}</h1>
+      <p className="text-gray-700">{pet.type} • {pet.age} years old</p>
+      <p className="mt-4 text-lg">{pet.description}</p>
 
-          <div className="flex gap-4">
-            <button onClick={() => setShowForm(true)} className="bg-blue-700 text-white px-4 py-2 rounded">Request Adoption</button>
-            <a href="/pets" className="px-4 py-2 border rounded">Back to list</a>
-          </div>
+      {/* LOGIN CHECK */}
+      {!user ? (
+        <button
+          className="mt-6 bg-blue-600 text-white px-6 py-3 rounded"
+          onClick={() => navigate("/login")}
+        >
+          Login to Request Adoption
+        </button>
+      ) : (
+        <button
+          className="mt-6 bg-green-600 text-white px-6 py-3 rounded"
+          onClick={() => setShowForm(true)}
+        >
+          Request Adoption
+        </button>
+      )}
 
-          {msg && <p className="mt-4 text-sm text-green-700">{msg}</p>}
-        </div>
-      </div>
-
-      {/* Modal / Form */}
+      {/* MODAL */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-40">
-          <div className="bg-white rounded p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-3">Adoption Request for {pet.name}</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">
+              Adoption Request for {pet.name}
+            </h2>
 
-            <label className="block text-sm font-medium">Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border p-2 rounded mb-3" />
+            <textarea
+              className="w-full border p-2 rounded"
+              rows="4"
+              placeholder="Your message (optional)"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
 
-            <label className="block text-sm font-medium">Email</label>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border p-2 rounded mb-3" />
+            <div className="flex justify-end mt-4 gap-3">
+              <button
+                className="px-4 py-2 border rounded"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </button>
 
-            <label className="block text-sm font-medium">Message (optional)</label>
-            <textarea value={message} onChange={(e) => setMessage(e.target.value)} className="w-full border p-2 rounded mb-4" rows={4} />
-
-            <div className="flex justify-end gap-3">
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 border rounded">Cancel</button>
-              <button onClick={handleRequest} disabled={sending} className="px-4 py-2 bg-blue-700 text-white rounded">
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded"
+                onClick={sendRequest}
+                disabled={sending}
+              >
                 {sending ? "Sending..." : "Send Request"}
               </button>
             </div>
