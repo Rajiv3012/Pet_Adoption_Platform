@@ -17,23 +17,23 @@ export default function Header() {
         {/* Navigation Links */}
         <div className="flex items-center space-x-6">
 
-          <Link to="/" className="hover:text-gray-200">
-            Home
-          </Link>
+          <Link to="/" className="hover:text-gray-200">Home</Link>
+          <Link to="/pets" className="hover:text-gray-200">Pets</Link>
 
-          <Link to="/pets" className="hover:text-gray-200">
-            Pets
-          </Link>
+          {/* 🔥 Admin Link (only visible to admin) */}
+          {user?.role === "admin" && (
+            <Link to="/admin/dashboard" className="hover:text-gray-200 font-semibold">
+              Admin Panel
+            </Link>
+          )}
 
-          {/* AUTH AREA */}
+          {/* Authentication */}
           {user ? (
             <>
-              {/* Show logged-in username */}
               <span className="font-semibold text-yellow-300">
                 Hi, {user.name}
               </span>
 
-              {/* Logout button */}
               <button
                 onClick={logout}
                 className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
@@ -43,7 +43,11 @@ export default function Header() {
             </>
           ) : (
             <>
-              {/* Show only when user is NOT logged in */}
+              {/* 🔐 Admin login (always visible when NOT logged in) */}
+              <Link to="/admin/login" className="hover:text-gray-200">
+                Admin Login
+              </Link>
+
               <Link to="/login" className="hover:text-gray-200">
                 Login
               </Link>

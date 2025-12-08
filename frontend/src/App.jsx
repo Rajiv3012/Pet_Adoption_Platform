@@ -9,6 +9,9 @@ import PetDetails from "./pages/PetDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import RequireAdmin from "./components/RequireAdmin";
 
 export default function App() {
   return (
@@ -24,6 +27,12 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={
+  <RequireAdmin>
+    <AdminDashboard />
+  </RequireAdmin>
+} />
         </Routes>
       </main>
 
