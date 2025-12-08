@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import petRoutes from "./routes/pets.js";
+import adoptionRoutes from "./routes/adoptionRequests.js";
 dotenv.config();
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
 
+app.use("/api/adoption-requests", adoptionRoutes);
 
 // MongoDB Connection
 mongoose
