@@ -20,10 +20,17 @@ export default function Header() {
           <Link to="/" className="hover:text-gray-200">Home</Link>
           <Link to="/pets" className="hover:text-gray-200">Pets</Link>
 
-          {/* 🔥 Admin Link (only visible to admin) */}
+          {/* ⭐ Admin Dashboard link (only for admin users) */}
           {user?.role === "admin" && (
             <Link to="/admin/dashboard" className="hover:text-gray-200 font-semibold">
               Admin Panel
+            </Link>
+          )}
+
+          {/* ⭐ My Requests (only for normal logged-in users) */}
+          {user && user.role !== "admin" && (
+            <Link to="/my-requests" className="hover:text-gray-200">
+              My Requests
             </Link>
           )}
 
@@ -43,7 +50,7 @@ export default function Header() {
             </>
           ) : (
             <>
-              {/* 🔐 Admin login (always visible when NOT logged in) */}
+              {/* Always visible when NOT logged in */}
               <Link to="/admin/login" className="hover:text-gray-200">
                 Admin Login
               </Link>

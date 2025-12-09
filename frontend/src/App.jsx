@@ -12,7 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import RequireAdmin from "./components/RequireAdmin";
-
+import MyRequests from "./pages/MyRequests";
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -22,6 +22,8 @@ export default function App() {
       <main className="flex-1 p-6">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/my-requests" element={<MyRequests />} />
+
           <Route path="/pets" element={<Pets />} />
           <Route path="/pets/:id" element={<PetDetails />} />
           <Route path="/login" element={<Login />} />

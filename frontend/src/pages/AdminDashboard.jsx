@@ -16,25 +16,32 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  // APPROVE REQUEST
-  const handleApprove = async (id) => {
-    try {
-      await api.put(`/adoption-requests/${id}/approve`);
-      loadRequests(); // refresh
-    } catch (err) {
-      console.log("APPROVE ERROR:", err);
-    }
-  };
+  // APPROVE REQUEST (instant UI update)
+const handleApprove = async (id) => {
+  try {
+    const res = await api.put(`/adoption-requests/${id}/approve`);
 
-  // REJECT REQUEST
-  const handleReject = async (id) => {
-    try {
-      await api.put(`/adoption-requests/${id}/reject`);
-      loadRequests(); // refresh
-    } catch (err) {
-      console.log("REJECT ERROR:", err);
-    }
-  };
+    setRequests((prev) =>
+      prev.map((req) => (req._id === id ? res.data.request : req))
+    );
+  } catch (err) {
+    console.log("APPROVE ERROR:", err);
+  }
+};
+
+// REJECT REQUEST (instant UI update)
+const handleReject = async (id) => {
+  try {
+    const res = await api.put(`/adoption-requests/${id}/reject`);
+
+    setRequests((prev) =>
+      prev.map((req) => (req._id === id ? res.data.request : req))
+    );
+  } catch (err) {
+    console.log("REJECT ERROR:", err);
+  }
+};
+
 
   useEffect(() => {
     loadRequests();
