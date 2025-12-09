@@ -1,124 +1,102 @@
-import { useEffect, useState, useContext } from "react";
+
+import { AuthContext } from "../context/AuthContext";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/client";
-import { AuthContext } from "../context/AuthContext";
 
 export default function PetDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
 
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    const loadPet = async () => {
-      try {
-        const res = await api.get(`/pets/${id}`);
-        setPet(res.data);
-      } catch (err) {
-        console.log("Error loading pet:", err);
-      }
-      setLoading(false);
-    };
-
-    loadPet();
-  }, [id]);
-
-  const sendRequest = async () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
-    setSending(true);
-
+  const loadPet = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await api.post(
-        "/adoption-requests",
-        { petId: id, message },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      alert("Request sent successfully!");
-      setShowForm(false);
-      setMessage("");
+      const res = await api.get(`/pets/${id}`);
+      setPet(res.data);
     } catch (err) {
-      console.log(err);
-      alert("Failed to send request");
+      console.log("Error loading pet:", err);
     }
-
-    setSending(false);
+    setLoading(false);
   };
 
-  if (loading) return <div className="p-10">Loading...</div>;
-  if (!pet) return <div className="p-10">Pet not found</div>;
+  useEffect(() => {
+    loadPet();
+  }, []);
+
+  const handleAdopt = async () => {
+    setError("");
+    setSuccess("");
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      setError("Please login to submit adoption request.");
+      return navigate("/login");
+    }
+
+    try {
+      const res = await api.post("/adoption-requests", {
+        petId: pet._id,
+        userId: user.id,
+        message
+      });
+
+      setSuccess("Adoption request submitted successfully!");
+    } catch (err) {
+      console.log("ADOPT ERROR:", err);
+      setError(err.response?.data?.msg || "Something went wrong");
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center text-xl p-10">Loading...</div>;
+  }
+
+  if (!pet) {
+    return <div className="text-center text-xl p-10">Pet not found.</div>;
+  }
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-5">
-      <img src={pet.image} className="w-full h-80 object-cover rounded mb-6" />
-      <h1 className="text-4xl font-bold mb-2">{pet.name}</h1>
-      <p className="text-gray-700">{pet.type} • {pet.age} years old</p>
-      <p className="mt-4 text-lg">{pet.description}</p>
+    <div className="max-w-4xl mx-auto p-6">
+      <img
+        src={pet.image}
+        alt={pet.name}
+        className="w-full h-80 object-cover rounded-lg shadow"
+      />
 
-      {/* LOGIN CHECK */}
-      {!user ? (
-        <button
-          className="mt-6 bg-blue-600 text-white px-6 py-3 rounded"
-          onClick={() => navigate("/login")}
-        >
-          Login to Request Adoption
-        </button>
+      <h1 className="text-4xl font-bold mt-4">{pet.name}</h1>
+      <p className="text-gray-700 text-lg">{pet.type} • {pet.age} years old</p>
+
+      <p className="mt-4 text-gray-600">{pet.description}</p>
+
+      {pet.adopted ? (
+        <p className="mt-6 text-xl text-red-600 font-bold">
+          This pet has already been adopted.
+        </p>
       ) : (
-        <button
-          className="mt-6 bg-green-600 text-white px-6 py-3 rounded"
-          onClick={() => setShowForm(true)}
-        >
-          Request Adoption
-        </button>
-      )}
+        <>
+          <textarea
+            className="w-full border p-3 mt-6 rounded"
+            placeholder="Why do you want to adopt this pet?"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
 
-      {/* MODAL */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">
-              Adoption Request for {pet.name}
-            </h2>
+          {error && <p className="text-red-600 mt-2">{error}</p>}
+          {success && <p className="text-green-600 mt-2">{success}</p>}
 
-            <textarea
-              className="w-full border p-2 rounded"
-              rows="4"
-              placeholder="Your message (optional)"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-
-            <div className="flex justify-end mt-4 gap-3">
-              <button
-                className="px-4 py-2 border rounded"
-                onClick={() => setShowForm(false)}
-              >
-                Cancel
-              </button>
-
-              <button
-                className="px-4 py-2 bg-green-600 text-white rounded"
-                onClick={sendRequest}
-                disabled={sending}
-              >
-                {sending ? "Sending..." : "Send Request"}
-              </button>
-            </div>
-          </div>
-        </div>
+          <button
+            onClick={handleAdopt}
+            className="mt-4 w-full bg-blue-700 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-800 transition"
+          >
+            Adopt This Pet
+          </button>
+        </>
       )}
     </div>
   );
