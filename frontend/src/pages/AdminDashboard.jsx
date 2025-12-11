@@ -1,119 +1,79 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import api from "../api/client";
 
 export default function AdminDashboard() {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(null);
 
-  // Load all adoption requests
-  const loadRequests = async () => {
+  const loadStats = async () => {
     try {
-      const res = await api.get("/adoption-requests");
-      setRequests(res.data);
+      const res = await api.get("/admin/stats");
+      setStats(res.data);
     } catch (err) {
-      console.log("ADMIN FETCH ERROR:", err);
+      console.log("ADMIN STATS ERROR:", err);
     }
-    setLoading(false);
   };
 
-  // APPROVE REQUEST (instant UI update)
-const handleApprove = async (id) => {
-  try {
-    const res = await api.put(`/adoption-requests/${id}/approve`);
-
-    setRequests((prev) =>
-      prev.map((req) => (req._id === id ? res.data.request : req))
-    );
-  } catch (err) {
-    console.log("APPROVE ERROR:", err);
-  }
-};
-
-// REJECT REQUEST (instant UI update)
-const handleReject = async (id) => {
-  try {
-    const res = await api.put(`/adoption-requests/${id}/reject`);
-
-    setRequests((prev) =>
-      prev.map((req) => (req._id === id ? res.data.request : req))
-    );
-  } catch (err) {
-    console.log("REJECT ERROR:", err);
-  }
-};
-
-
   useEffect(() => {
-    loadRequests();
+    loadStats();
   }, []);
 
-  if (loading) return <div className="p-10 text-xl">Loading...</div>;
+  if (!stats) return <p>Loading...</p>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-red-700 mb-6">Admin Dashboard</h1>
+    <div>
+      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      <table className="w-full border-collapse shadow">
-        <thead>
-          <tr className="bg-red-600 text-white">
-            <th className="p-3 text-left">Pet</th>
-            <th className="p-3 text-left">User</th>
-            <th className="p-3 text-left">Message</th>
-            <th className="p-3 text-left">Status</th>
-            <th className="p-3 text-left">Action</th>
-          </tr>
-        </thead>
+      {/* STAT CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="bg-white shadow p-6 rounded-lg">
+          <h2 className="text-xl font-semibold">Total Pets</h2>
+          <p className="text-3xl">{stats.totalPets}</p>
+        </div>
 
-        <tbody>
-          {requests.map((req) => (
-            <tr key={req._id} className="border-b hover:bg-gray-100">
-              <td className="p-3 font-semibold">{req.petId?.name}</td>
+        <div className="bg-white shadow p-6 rounded-lg">
+          <h2 className="text-xl font-semibold">Pending Requests</h2>
+          <p className="text-3xl text-yellow-600">{stats.pending}</p>
+        </div>
 
-              <td className="p-3">
-                {req.userId?.name}
-                <br />
-                <span className="text-gray-500">{req.userId?.email}</span>
-              </td>
+        <div className="bg-white shadow p-6 rounded-lg">
+          <h2 className="text-xl font-semibold">Approved</h2>
+          <p className="text-3xl text-green-600">{stats.approved}</p>
+        </div>
 
-              <td className="p-3">{req.message}</td>
+        <div className="bg-white shadow p-6 rounded-lg">
+          <h2 className="text-xl font-semibold">Rejected</h2>
+          <p className="text-3xl text-red-600">{stats.rejected}</p>
+        </div>
+      </div>
 
-              <td className="p-3 font-bold">
-                {req.status === "pending" && (
-                  <span className="text-yellow-600">Pending</span>
-                )}
-                {req.status === "approved" && (
-                  <span className="text-green-600">Approved</span>
-                )}
-                {req.status === "rejected" && (
-                  <span className="text-red-600">Rejected</span>
-                )}
-              </td>
+      {/* QUICK ACTIONS */}
+      <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
 
-              <td className="p-3">
-                {req.status === "pending" ? (
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleApprove(req._id)}
-                      className="bg-green-600 text-white px-4 py-2 rounded"
-                    >
-                      Approve
-                    </button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                    <button
-                      onClick={() => handleReject(req._id)}
-                      className="bg-red-600 text-white px-4 py-2 rounded"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                ) : (
-                  <span className="italic text-gray-500">No action</span>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <Link
+          to="/admin/requests"
+          className="bg-blue-600 text-white p-6 rounded-lg shadow hover:bg-blue-700 text-center"
+        >
+          Review Adoption Requests
+        </Link>
+
+        <Link
+          to="/admin/pets"
+          className="bg-green-600 text-white p-6 rounded-lg shadow hover:bg-green-700 text-center"
+        >
+          Manage Pets
+        </Link>
+
+        <Link
+          to="/admin/pets/add"
+          className="bg-purple-600 text-white p-6 rounded-lg shadow hover:bg-purple-700 text-center"
+        >
+          Add New Pet
+        </Link>
+
+      </div>
     </div>
   );
 }

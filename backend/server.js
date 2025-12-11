@@ -10,6 +10,7 @@ import adoptionRoutes from "./routes/adoptionRequests.js";
 import adminRoutes from "./routes/admin.js";
 import setupAdminRoutes from "./routes/setupAdmin.js";
 
+
 dotenv.config();
 
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/pets", petRoutes);
 app.use("/api/adoption-requests", adoptionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/setup", setupAdminRoutes);
+
 
 // -------------------
 // MONGODB CONNECTION

@@ -1,24 +1,31 @@
+import express from "express";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Admin from "../models/Admin.js";
 
-export default async function adminAuth(req, res, next) {
+const router = express.Router();
+
+router.post("/login", async (req, res) => {
   try {
-    const auth = req.headers.authorization || "";
-    const token = auth.split(" ")[1];
+    const { username, password } = req.body;
 
-    if (!token) return res.status(401).json({ msg: "Missing token" });
+    const admin = await Admin.findOne({ username });
+    if (!admin) return res.status(400).json({ msg: "Invalid credentials" });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded || decoded.role !== "admin") return res.status(403).json({ msg: "Forbidden" });
+    const ok = await bcrypt.compare(password, admin.password);
+    if (!ok) return res.status(400).json({ msg: "Invalid credentials" });
 
-    // Optionally check admin exists
-    const admin = await Admin.findById(decoded.adminId);
-    if (!admin) return res.status(403).json({ msg: "Admin not found" });
+    const token = jwt.sign({ id: admin._id, role: "admin" }, process.env.JWT_SECRET);
 
-    req.admin = admin;
-    next();
+    res.json({
+      msg: "Admin login successful",
+      token,
+      admin: { id: admin._id, username: admin.username, role: "admin" }
+    });
   } catch (err) {
-    console.error("ADMIN AUTH ERROR:", err);
-    return res.status(401).json({ msg: "Invalid token" });
+    console.log("ADMIN LOGIN ERROR:", err);
+    res.status(500).json({ msg: "Server error" });
   }
-}
+});
+
+export default router;

@@ -1,9 +1,25 @@
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Header() {
   const { user, logout } = useContext(AuthContext);
+
+  // Detect admin login from localStorage
+  const [admin, setAdmin] = useState(() => {
+    return JSON.parse(localStorage.getItem("admin")) || null;
+  });
+
+  useEffect(() => {
+    const storedAdmin = JSON.parse(localStorage.getItem("admin"));
+    setAdmin(storedAdmin);
+  }, []);
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem("admin");
+    setAdmin(null);
+    window.location.href = "/admin/login";
+  };
 
   return (
     <header className="bg-blue-700 text-white py-4 shadow">
@@ -14,28 +30,34 @@ export default function Header() {
           Pet Adoption
         </Link>
 
-        {/* Navigation Links */}
         <div className="flex items-center space-x-6">
-
+          
+          {/* Normal Navigation */}
           <Link to="/" className="hover:text-gray-200">Home</Link>
           <Link to="/pets" className="hover:text-gray-200">Pets</Link>
 
-          {/* ⭐ Admin Dashboard link (only for admin users) */}
-          {user?.role === "admin" && (
-            <Link to="/admin/dashboard" className="hover:text-gray-200 font-semibold">
-              Admin Panel
-            </Link>
+          {/* -------------------------
+               ADMIN NAVIGATION
+          -------------------------- */}
+          {admin && (
+            <>
+              <Link to="/admin/dashboard" className="hover:text-gray-200">
+                Admin Panel
+              </Link>
+
+              <button
+                onClick={handleAdminLogout}
+                className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
+              >
+                Logout (Admin)
+              </button>
+            </>
           )}
 
-          {/* ⭐ My Requests (only for normal logged-in users) */}
-          {user && user.role !== "admin" && (
-            <Link to="/my-requests" className="hover:text-gray-200">
-              My Requests
-            </Link>
-          )}
-
-          {/* Authentication */}
-          {user ? (
+          {/* -------------------------
+               USER NAVIGATION
+          -------------------------- */}
+          {!admin && user && (
             <>
               <span className="font-semibold text-yellow-300">
                 Hi, {user.name}
@@ -48,9 +70,13 @@ export default function Header() {
                 Logout
               </button>
             </>
-          ) : (
+          )}
+
+          {/* -------------------------
+               WHEN NO ONE IS LOGGED IN
+          -------------------------- */}
+          {!admin && !user && (
             <>
-              {/* Always visible when NOT logged in */}
               <Link to="/admin/login" className="hover:text-gray-200">
                 Admin Login
               </Link>
@@ -65,7 +91,6 @@ export default function Header() {
             </>
           )}
         </div>
-
       </nav>
     </header>
   );

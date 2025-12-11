@@ -25,7 +25,6 @@ export default function AdminLogin() {
 
       navigate("/admin/dashboard");
     } catch (err) {
-      console.log("ADMIN LOGIN ERROR:", err);
       setError(err.response?.data?.msg || "Invalid username or password");
     }
   };
@@ -38,40 +37,30 @@ export default function AdminLogin() {
           Admin Login
         </h1>
 
-        {/* USERNAME */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-1">Username</label>
-          <input
-            type="text"
-            className="w-full border p-3 rounded focus:outline-red-600"
-            placeholder="admin"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
+        <label className="block mb-1 font-medium">Username</label>
+        <input
+          type="text"
+          className="w-full border p-3 rounded mb-4"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
 
-        {/* PASSWORD */}
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-1">Password</label>
-          <input
-            type="password"
-            className="w-full border p-3 rounded focus:outline-red-600"
-            placeholder="********"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <label className="block mb-1 font-medium">Password</label>
+        <input
+          type="password"
+          className="w-full border p-3 rounded mb-4"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-        {/* ERROR MESSAGE */}
-        {error && <p className="text-red-600 mb-3 text-center">{error}</p>}
+        {error && <p className="text-red-600 text-center">{error}</p>}
 
         <button
           onClick={handleAdminLogin}
-          className="w-full bg-red-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-red-700 transition"
+          className="w-full bg-red-600 text-white py-3 rounded-lg"
         >
-          Login as Admin
+          Login
         </button>
-
       </div>
     </div>
   );

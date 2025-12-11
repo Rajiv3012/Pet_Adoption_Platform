@@ -1,8 +1,8 @@
 import { createContext, useState, useEffect } from "react";
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
-function AuthProvider({ children }) {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     return JSON.parse(localStorage.getItem("user")) || null;
   });
@@ -20,6 +20,7 @@ function AuthProvider({ children }) {
   const login = (userData, jwtToken) => {
     setUser(userData);
     setToken(jwtToken);
+
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("token", jwtToken);
   };
@@ -27,6 +28,7 @@ function AuthProvider({ children }) {
   const logout = () => {
     setUser(null);
     setToken(null);
+
     localStorage.removeItem("user");
     localStorage.removeItem("token");
   };
@@ -37,5 +39,3 @@ function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
-export { AuthContext, AuthProvider };
