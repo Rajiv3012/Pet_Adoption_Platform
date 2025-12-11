@@ -1,100 +1,46 @@
 import { useState } from "react";
 import api from "../api/client";
-import { useNavigate } from "react-router-dom";
+import AdminLayout from "../layouts/AdminLayout";
 
 export default function AdminAddPet() {
-  const navigate = useNavigate();
-
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [age, setAge] = useState("");
-  const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
-
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [image, setImage] = useState(null);
 
   const handleSubmit = async () => {
-    setError("");
-    setSuccess("");
+    if (!image) return alert("Please choose an image");
 
-    if (!name || !type || !age || !image) {
-      setError("All fields except description are required.");
-      return;
-    }
+    const fd = new FormData();
+    fd.append("name", name);
+    fd.append("type", type);
+    fd.append("age", age);
+    fd.append("description", description);
+    fd.append("image", image);
 
     try {
-      await api.post("/pets", {
-        name,
-        type,
-        age,
-        image,
-        description,
-      });
-
-      setSuccess("Pet added successfully!");
-      setTimeout(() => navigate("/admin/pets"), 1500);
+      await api.post("/pets", fd, { headers: { "Content-Type": "multipart/form-data" } });
+      alert("Pet added");
+      // reset or navigate
+      setName(""); setType(""); setAge(""); setDescription(""); setImage(null);
     } catch (err) {
-      console.log("ADD PET ERROR:", err);
-      setError("Failed to add pet.");
+      console.error("ADD PET ERR:", err);
+      alert(err.response?.data?.msg || "Failed to add pet");
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-
-      <h1 className="text-3xl font-bold text-red-700 mb-6">
-        Add New Pet
-      </h1>
-
-      <div className="space-y-4">
-
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Pet Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Pet Type (Dog, Cat etc.)"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        />
-
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Age"
-          type="number"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-        />
-
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Image URL"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
-        />
-
-        <textarea
-          className="w-full border p-3 rounded"
-          placeholder="Description (optional)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        {error && <p className="text-red-600">{error}</p>}
-        {success && <p className="text-green-600">{success}</p>}
-
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700"
-        >
-          Add Pet
-        </button>
+    <AdminLayout>
+      <h1 className="text-2xl font-bold mb-4">Add Pet</h1>
+      <div className="max-w-lg space-y-3">
+        <input value={name} onChange={e=>setName(e.target.value)} placeholder="Name" className="w-full border p-2 rounded"/>
+        <input value={type} onChange={e=>setType(e.target.value)} placeholder="Type" className="w-full border p-2 rounded"/>
+        <input value={age} onChange={e=>setAge(e.target.value)} placeholder="Age" type="number" className="w-full border p-2 rounded"/>
+        <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Description" className="w-full border p-2 rounded"/>
+        <input type="file" onChange={e=>setImage(e.target.files[0])} />
+        <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded">Add Pet</button>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

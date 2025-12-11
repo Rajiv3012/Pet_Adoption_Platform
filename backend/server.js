@@ -24,6 +24,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
+// serve uploaded images
+app.use("/uploads", express.static("uploads"));
 
 // -------------------
 // ROUTES
