@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminRequests from "./pages/AdminRequests";
 import AdminManagePets from "./pages/AdminManagePets";
 import AdminAddPet from "./pages/AdminAddPet";
+import AdminEditPet from "./pages/AdminEditPet";   // ✅ MUST IMPORT THIS
 
 export default function App() {
   return (
@@ -42,7 +43,7 @@ export default function App() {
           {/* ADMIN LOGIN */}
           <Route path="/admin/login" element={<AdminLogin />} />
 
-          {/* PROTECTED ADMIN ROUTES */}
+          {/* ADMIN PROTECTED ROUTES */}
           <Route
             path="/admin/dashboard"
             element={
@@ -79,8 +80,17 @@ export default function App() {
             }
           />
 
+          {/* ✅ EDIT PET PAGE (YOU MISSED THIS!) */}
+          <Route
+            path="/admin/pets/edit/:id"
+            element={
+              <RequireAdmin>
+                <AdminEditPet />
+              </RequireAdmin>
+            }
+          />
+
         </Routes>
-        
       </main>
 
       <Footer />

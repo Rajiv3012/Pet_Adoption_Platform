@@ -51,4 +51,35 @@ router.post("/", async (req, res) => {
   }
 });
 
+// DELETE PET
+router.delete("/:id", async (req, res) => {
+  try {
+    await Pet.findByIdAndDelete(req.params.id);
+    res.json({ msg: "Pet deleted" });
+  } catch (err) {
+    console.log("DELETE PET ERROR:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+
+// UPDATE PET
+router.put("/:id", async (req, res) => {
+  try {
+    const updated = await Pet.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ msg: "Pet not found" });
+
+    res.json({ msg: "Pet updated", pet: updated });
+  } catch (err) {
+    console.log("UPDATE PET ERROR:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+
 export default router;
