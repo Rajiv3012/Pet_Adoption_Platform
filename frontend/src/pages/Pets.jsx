@@ -211,8 +211,8 @@ export default function Pets() {
                         : 'translateY(32px) scale(0.95)'
                     }}
                   >
-                  {/* Pet Image with Parallax Effect */}
-                  <div className="relative w-full h-64 bg-gradient-to-br from-pink-100 to-purple-100 overflow-hidden">
+                  {/* Pet Image - Professional Design */}
+                  <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden">
                     <img
                       src={pet.image}
                       alt={pet.name}

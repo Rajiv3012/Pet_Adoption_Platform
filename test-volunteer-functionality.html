@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Volunteer Functionality</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Volunteer Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Backend Connection</h2>
+        <button onclick="testBackendConnection()">Test Backend Connection</button>
+        <div id="connectionResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Shelters API (Required for Volunteer Form)</h2>
+        <button onclick="testSheltersAPI()">Test Shelters API</button>
+        <div id="sheltersResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Quick Register (Simple Form)</h2>
+        <div class="form-group">
+            <label>Name:</label>
+            <input type="text" id="quickName" value="John Doe" />
+        </div>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="quickEmail" value="john.doe@example.com" />
+        </div>
+        <div class="form-group">
+            <label>Phone:</label>
+            <input type="tel" id="quickPhone" value="555-123-4567" />
+        </div>
+        <div class="form-group">
+            <label>Address:</label>
+            <textarea id="quickAddress">123 Main St, City, State 12345</textarea>
+        </div>
+        <div class="form-group">
+            <label>Date of Birth:</label>
+            <input type="date" id="quickDOB" value="1990-01-01" />
+        </div>
+        <div class="form-group">
+            <label>Shelter ID (will be populated from shelters):</label>
+            <select id="quickShelter">
+                <option value="">Select a shelter</option>
+            </select>
+        </div>
+        <button onclick="testQuickRegister()">Test Quick Register</button>
+        <div id="quickRegisterResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Test Full Application (Complete Form)</h2>
+        <button onclick="testFullApplication()">Test Full Application</button>
+        <div id="fullApplicationResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Verify Data in Backend</h2>
+        <button onclick="verifyVolunteerData()">Check Saved Volunteers</button>
+        <div id="verifyResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        async function testBackendConnection() {
+            const resultDiv = document.getElementById('connectionResult');
+            try {
+                const response = await fetch(`${API_BASE}/shelters`);
+                if (response.ok) {
+                    resultDiv.innerHTML = '<div class="success">✅ Backend connection successful!</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ Backend connection failed: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Backend connection error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testSheltersAPI() {
+            const resultDiv = document.getElementById('sheltersResult');
+            try {
+                const response = await fetch(`${API_BASE}/shelters`);
+                const shelters = await response.json();
+                
+                if (response.ok && shelters.length > 0) {
+                    // Populate shelter dropdown
+                    const shelterSelect = document.getElementById('quickShelter');
+                    shelterSelect.innerHTML = '<option value="">Select a shelter</option>';
+                    shelters.forEach(shelter => {
+                        const option = document.createElement('option');
+                        option.value = shelter._id;
+                        option.textContent = `${shelter.name} - ${shelter.city}, ${shelter.state}`;
+                        shelterSelect.appendChild(option);
+                    });
+                    
+                    resultDiv.innerHTML = `<div class="success">✅ Found ${shelters.length} shelters</div><pre>${JSON.stringify(shelters[0], null, 2)}</pre>`;
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ No shelters found or API error</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Shelters API error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testQuickRegister() {
+            const resultDiv = document.getElementById('quickRegisterResult');
+            
+            const volunteerData = {
+                name: document.getElementById('quickName').value,
+                email: document.getElementById('quickEmail').value,
+                phone: document.getElementById('quickPhone').value,
+                address: document.getElementById('quickAddress').value,
+                dateOfBirth: document.getElementById('quickDOB').value,
+                shelterId: document.getElementById('quickShelter').value,
+                skills: ['Animal Care'],
+                experience: 'none',
+                interests: ['Dogs'],
+                emergencyContact: {
+                    name: 'Jane Doe',
+                    phone: '555-987-6543',
+                    relationship: 'Spouse'
+                },
+                availability: {
+                    monday: { available: true, timeSlots: ['9:00 AM - 12:00 PM'] },
+                    tuesday: { available: false, timeSlots: [] },
+                    wednesday: { available: false, timeSlots: [] },
+                    thursday: { available: false, timeSlots: [] },
+                    friday: { available: false, timeSlots: [] },
+                    saturday: { available: true, timeSlots: ['10:00 AM - 2:00 PM'] },
+                    sunday: { available: false, timeSlots: [] }
+                }
+            };
+
+            if (!volunteerData.shelterId) {
+                resultDiv.innerHTML = '<div class="error">❌ Please select a shelter first</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/volunteers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(volunteerData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Quick register successful!</div><pre>${JSON.stringify(result, null, 2)}</pre>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Quick register failed: ${result.msg || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Quick register error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testFullApplication() {
+            const resultDiv = document.getElementById('fullApplicationResult');
+            
+            // Get first shelter ID
+            const shelterSelect = document.getElementById('quickShelter');
+            const shelterId = shelterSelect.value || (shelterSelect.options[1] ? shelterSelect.options[1].value : '');
+            
+            if (!shelterId) {
+                resultDiv.innerHTML = '<div class="error">❌ Please test shelters API first to get shelter IDs</div>';
+                return;
+            }
+
+            const fullVolunteerData = {
+                name: 'Jane Smith',
+                email: 'jane.smith@example.com',
+                phone: '555-456-7890',
+                address: '456 Oak Ave, Another City, State 54321',
+                dateOfBirth: '1985-05-15',
+                shelterId: shelterId,
+                skills: ['Animal Care', 'Dog Walking', 'Event Planning', 'Photography'],
+                experience: 'intermediate',
+                interests: ['Dogs', 'Cats', 'Special Needs Animals'],
+                emergencyContact: {
+                    name: 'Bob Smith',
+                    phone: '555-111-2222',
+                    relationship: 'Brother'
+                },
+                availability: {
+                    monday: { available: true, timeSlots: ['9:00 AM - 12:00 PM', '1:00 PM - 5:00 PM'] },
+                    tuesday: { available: true, timeSlots: ['9:00 AM - 12:00 PM'] },
+                    wednesday: { available: false, timeSlots: [] },
+                    thursday: { available: true, timeSlots: ['3:00 PM - 6:00 PM'] },
+                    friday: { available: false, timeSlots: [] },
+                    saturday: { available: true, timeSlots: ['9:00 AM - 1:00 PM'] },
+                    sunday: { available: true, timeSlots: ['10:00 AM - 2:00 PM'] }
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/volunteers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(fullVolunteerData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Full application successful!</div><pre>${JSON.stringify(result, null, 2)}</pre>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Full application failed: ${result.msg || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Full application error: ' + error.message + '</div>';
+            }
+        }
+
+        async function verifyVolunteerData() {
+            const resultDiv = document.getElementById('verifyResult');
+            try {
+                // Note: This endpoint requires admin authentication in production
+                // For testing, we'll try to access it directly
+                const response = await fetch(`${API_BASE}/volunteers`);
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '<div class="error">❌ Admin authentication required to view volunteers. This is expected behavior for security.</div>';
+                    return;
+                }
+                
+                const volunteers = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Found ${volunteers.length} volunteers in database</div><pre>${JSON.stringify(volunteers, null, 2)}</pre>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Error fetching volunteers: ${volunteers.msg || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Verify data error: ' + error.message + '</div>';
+            }
+        }
+
+        // Auto-test connection on page load
+        window.onload = function() {
+            testBackendConnection();
+            setTimeout(testSheltersAPI, 1000);
+        };
+    </script>
+</body>
+</html>

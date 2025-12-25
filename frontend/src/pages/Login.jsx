@@ -44,6 +44,14 @@ export default function Login() {
         return;
       }
 
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address");
+        setIsLoading(false);
+        return;
+      }
+
       const res = await authAPI.login({
         email,
         password,
@@ -88,7 +96,8 @@ export default function Login() {
         // Check if authentication was successful by checking localStorage
         const token = localStorage.getItem("token");
         if (token) {
-          navigate("/welcome"); // Redirect to welcome page
+          navigate("/welcome");
+          window.location.reload(); // Refresh page after Google sign in
         }
       }
     }, 1000);
@@ -103,7 +112,8 @@ export default function Login() {
         popup.close();
         clearInterval(checkClosed);
         setIsGoogleLoading(false);
-        navigate("/welcome"); // Redirect to welcome page
+        navigate("/welcome");
+        window.location.reload(); // Refresh page after Google sign in
       } else if (event.data.type === 'GOOGLE_AUTH_ERROR') {
         popup.close();
         clearInterval(checkClosed);

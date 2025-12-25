@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #ec4899;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #db2777;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            color: #059669;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .pet-card {
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: white;
+        }
+        .pet-card h3 {
+            margin: 0 0 10px 0;
+            color: #ec4899;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Pet Adoption API Test</h1>
+        <p>Test the connection between frontend and backend</p>
+        
+        <div>
+            <button onclick="testBackend()">Test Backend Connection</button>
+            <button onclick="fetchPets()">Fetch All Pets</button>
+            <button onclick="testCORS()">Test CORS</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        const resultDiv = document.getElementById('result');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            resultDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        function clearResults() {
+            resultDiv.innerHTML = '';
+        }
+
+        async function testBackend() {
+            clearResults();
+            log('Testing backend connection...');
+            
+            try {
+                const response = await fetch('http://localhost:5000');
+                const text = await response.text();
+                
+                if (response.ok) {
+                    log(`✅ Backend is running: ${text}`, 'success');
+                } else {
+                    log(`❌ Backend returned status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Backend connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function fetchPets() {
+            clearResults();
+            log('Fetching pets from API...');
+            
+            try {
+                const response = await fetch(`${API_URL}/pets`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const pets = await response.json();
+                
+                log(`✅ Successfully fetched ${pets.length} pets`, 'success');
+                log('\\n--- Pet Data ---\\n');
+                
+                if (pets.length === 0) {
+                    log('⚠️ No pets found in database', 'error');
+                } else {
+                    pets.forEach((pet, index) => {
+                        resultDiv.innerHTML += `
+                            <div class="pet-card">
+                                <h3>${index + 1}. ${pet.name}</h3>
+                                <p><strong>ID:</strong> ${pet._id}</p>
+                                <p><strong>Type:</strong> ${pet.type} | <strong>Breed:</strong> ${pet.breed}</p>
+                                <p><strong>Age:</strong> ${pet.age} years | <strong>Status:</strong> ${pet.adoptionStatus}</p>
+                                <p><strong>Shelter:</strong> ${pet.shelterId?.name || 'N/A'}</p>
+                            </div>
+                        `;
+                    });
+                }
+                
+            } catch (error) {
+                log(`❌ Failed to fetch pets: ${error.message}`, 'error');
+                log(`\\nPossible causes:`, 'error');
+                log('1. Backend server is not running', 'error');
+                log('2. CORS is not configured correctly', 'error');
+                log('3. API endpoint is incorrect', 'error');
+            }
+        }
+
+        async function testCORS() {
+            clearResults();
+            log('Testing CORS configuration...');
+            
+            try {
+                const response = await fetch(`${API_URL}/pets`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const corsHeader = response.headers.get('access-control-allow-origin');
+                
+                if (corsHeader) {
+                    log(`✅ CORS is configured: ${corsHeader}`, 'success');
+                } else {
+                    log(`⚠️ CORS header not found`, 'error');
+                }
+                
+                if (response.ok) {
+                    log(`✅ Request successful (Status: ${response.status})`, 'success');
+                } else {
+                    log(`❌ Request failed (Status: ${response.status})`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ CORS test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run tests on page load
+        window.onload = () => {
+            log('🚀 API Test Page Loaded');
+            log('Click buttons above to test the API connection');
+        };
+    </script>
+</body>
+</html>

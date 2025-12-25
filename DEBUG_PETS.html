@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Pet Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f3f4f6;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #ec4899; }
+        button {
+            background: #ec4899;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #db2777; }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        .success { color: #059669; font-weight: bold; }
+        .error { color: #dc2626; font-weight: bold; }
+        .pet-link {
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            background: #fce7f3;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .pet-link:hover {
+            border-color: #ec4899;
+            background: #fbcfe8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Debug Pet Details API</h1>
+        
+        <button onclick="listAllPets()">1. List All Pets</button>
+        <button onclick="testPetDetail()">2. Test Pet Detail</button>
+        <button onclick="clearResults()">Clear</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        const resultDiv = document.getElementById('result');
+
+        function log(message, type = 'info') {
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            resultDiv.innerHTML += `<div class="${className}">${message}</div>`;
+        }
+
+        function clearResults() {
+            resultDiv.innerHTML = '';
+        }
+
+        async function listAllPets() {
+            clearResults();
+            log('📋 Fetching all pets...\n');
+            
+            try {
+                const response = await fetch(`${API_URL}/pets`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const pets = await response.json();
+                log(`✅ Found ${pets.length} pets\n`, 'success');
+                
+                pets.forEach((pet, index) => {
+                    const petDiv = document.createElement('div');
+                    petDiv.className = 'pet-link';
+                    petDiv.innerHTML = `
+                        <strong>${index + 1}. ${pet.name}</strong> (${pet.type})<br>
+                        <small>ID: ${pet._id}</small>
+                    `;
+                    petDiv.onclick = () => testSpecificPet(pet._id, pet.name);
+                    resultDiv.appendChild(petDiv);
+                });
+                
+                log('\n💡 Click on any pet above to test its detail API');
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPetDetail() {
+            clearResults();
+            log('🔍 Testing pet detail API...\n');
+            
+            try {
+                // First get a pet ID
+                const listResponse = await fetch(`${API_URL}/pets`);
+                const pets = await listResponse.json();
+                
+                if (pets.length === 0) {
+                    log('❌ No pets found in database', 'error');
+                    return;
+                }
+                
+                const testPet = pets[0];
+                log(`Testing with: ${testPet.name}`);
+                log(`Pet ID: ${testPet._id}\n`);
+                
+                await testSpecificPet(testPet._id, testPet.name);
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSpecificPet(petId, petName) {
+            log(`\n🔍 Testing pet detail for: ${petName}`);
+            log(`Pet ID: ${petId}`);
+            log(`API URL: ${API_URL}/pets/${petId}\n`);
+            
+            try {
+                const response = await fetch(`${API_URL}/pets/${petId}`);
+                
+                log(`Response Status: ${response.status} ${response.statusText}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    log(`❌ Error Response: ${errorData}`, 'error');
+                    return;
+                }
+                
+                const pet = await response.json();
+                
+                log(`✅ Success! Pet details retrieved\n`, 'success');
+                log(`Name: ${pet.name}`);
+                log(`Type: ${pet.type}`);
+                log(`Breed: ${pet.breed}`);
+                log(`Age: ${pet.age} years`);
+                log(`Gender: ${pet.gender}`);
+                log(`Size: ${pet.size}`);
+                log(`Color: ${pet.color}`);
+                log(`Status: ${pet.adoptionStatus}`);
+                log(`Adoption Fee: $${pet.adoptionFee}`);
+                
+                if (pet.shelterId) {
+                    log(`\nShelter: ${pet.shelterId.name}`);
+                    log(`Location: ${pet.shelterId.city}, ${pet.shelterId.state}`);
+                }
+                
+                log(`\n✅ This pet detail API is working correctly!`, 'success');
+                log(`\n🌐 Frontend URL would be: http://localhost:5173/pets/${petId}`);
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run on load
+        window.onload = () => {
+            log('🚀 Pet Details Debug Tool\n');
+            log('Click "List All Pets" to see all available pets\n');
+        };
+    </script>
+</body>
+</html>

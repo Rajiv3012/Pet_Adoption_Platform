@@ -40,6 +40,14 @@ export default function Register() {
         return;
       }
 
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address");
+        setIsLoading(false);
+        return;
+      }
+
       if (password !== confirm) {
         setError("Passwords do not match");
         setIsLoading(false);
@@ -64,9 +72,10 @@ export default function Register() {
 
       setSuccess("Account created successfully! Redirecting...");
       
-      // Redirect to welcome page after success
+      // Redirect to welcome page after success and refresh
       setTimeout(() => {
         navigate("/welcome");
+        window.location.reload(); // Refresh page after account creation
       }, 2000);
     } catch (err) {
       console.log(err);
@@ -100,6 +109,7 @@ export default function Register() {
         const token = localStorage.getItem("token");
         if (token) {
           navigate("/welcome"); // Redirect to welcome page
+          window.location.reload(); // Refresh page after Google sign in
         }
       }
     }, 1000);
@@ -115,6 +125,7 @@ export default function Register() {
         clearInterval(checkClosed);
         setIsGoogleLoading(false);
         navigate("/welcome"); // Redirect to welcome page
+        window.location.reload(); // Refresh page after Google sign in
       } else if (event.data.type === 'GOOGLE_AUTH_ERROR') {
         popup.close();
         clearInterval(checkClosed);

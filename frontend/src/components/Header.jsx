@@ -80,12 +80,13 @@ export default function Header({ onDonateClick }) {
 
   // navigation items
   const navItems = [
+    { label: "Pet Haven", to: "/" },
     { label: "Home", to: "/" },
     { label: "Adopt", to: "/pets" },
     { label: "Donate", to: "/donate" },
     { label: "Volunteer", to: "/volunteer" },
     { label: "Shelters", to: "/shelters" },
-    { label: "Medical Records", to: "/medical-records" },
+    { label: "Records", to: "/medical-records" },
     { label: "About", to: "/about" },
     // Add Admin Panel for admin users only
     ...(user && user.role === "admin" ? [{ label: "Admin Panel", to: "/admin" }] : []),
@@ -289,7 +290,7 @@ export default function Header({ onDonateClick }) {
               <Link to="/donate" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-gray-800">Donate</Link>
               <Link to="/volunteer" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-gray-800">Volunteer</Link>
               <Link to="/shelters" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-gray-800">Shelters</Link>
-              <Link to="/medical-records" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-gray-800">Medical Records</Link>
+              <Link to="/medical-records" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-gray-800">Records</Link>
               <Link to="/about" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-gray-800">About</Link>
 
               <div className="border-t border-gray-100 mt-4 pt-4">

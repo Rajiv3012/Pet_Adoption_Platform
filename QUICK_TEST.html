@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #fce7f3 0%, #e9d5ff 100%);
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ec4899;
+            text-align: center;
+        }
+        button {
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.3);
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            min-height: 100px;
+        }
+        .success {
+            color: #059669;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .pet-card {
+            border: 2px solid #fce7f3;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background: white;
+        }
+        .pet-card h3 {
+            margin: 0 0 10px 0;
+            color: #ec4899;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .status.running {
+            background: #d1fae5;
+            color: #059669;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Pet Adoption - Connection Test</h1>
+        
+        <button onclick="testEverything()">🚀 Test Everything</button>
+        <button onclick="fetchPets()">🐕 Fetch Pets</button>
+        <button onclick="clearResults()">🗑️ Clear</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+
+        function log(message, type = 'info') {
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            resultDiv.innerHTML += `<div class="${className}">${message}</div>`;
+        }
+
+        function clearResults() {
+            resultDiv.innerHTML = '';
+        }
+
+        async function testEverything() {
+            clearResults();
+            log('🔍 Testing Connection...', 'info');
+            log('');
+            
+            // Test Backend
+            log('1️⃣ Testing Backend Server (http://localhost:5000)...');
+            try {
+                const response = await fetch('http://localhost:5000');
+                if (response.ok) {
+                    const text = await response.text();
+                    log(`✅ Backend: ${text}`, 'success');
+                    resultDiv.innerHTML += '<span class="status running">Backend Running</span><br><br>';
+                } else {
+                    log(`❌ Backend returned status: ${response.status}`, 'error');
+                    resultDiv.innerHTML += '<span class="status error">Backend Error</span><br><br>';
+                }
+            } catch (error) {
+                log(`❌ Backend not accessible: ${error.message}`, 'error');
+                resultDiv.innerHTML += '<span class="status error">Backend Offline</span><br><br>';
+                log('💡 Solution: Make sure backend is running with "npm run dev" in backend folder');
+                return;
+            }
+            
+            // Test API
+            log('2️⃣ Testing Pets API (http://localhost:5000/api/pets)...');
+            try {
+                const response = await fetch('http://localhost:5000/api/pets');
+                if (response.ok) {
+                    const pets = await response.json();
+                    log(`✅ API Working: Found ${pets.length} pets`, 'success');
+                    resultDiv.innerHTML += '<span class="status running">API Connected</span><br><br>';
+                    
+                    if (pets.length > 0) {
+                        log('');
+                        log('📋 Available Pets:', 'success');
+                        pets.forEach((pet, index) => {
+                            resultDiv.innerHTML += `
+                                <div class="pet-card">
+                                    <h3>${index + 1}. ${pet.name}</h3>
+                                    <p><strong>Type:</strong> ${pet.type} | <strong>Breed:</strong> ${pet.breed}</p>
+                                    <p><strong>Age:</strong> ${pet.age} years | <strong>Status:</strong> ${pet.adoptionStatus}</p>
+                                    <p><strong>ID:</strong> <code>${pet._id}</code></p>
+                                </div>
+                            `;
+                        });
+                    }
+                } else {
+                    log(`❌ API returned status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ API failed: ${error.message}`, 'error');
+            }
+            
+            // Test Frontend
+            log('');
+            log('3️⃣ Testing Frontend Server (http://localhost:5173)...');
+            try {
+                const response = await fetch('http://localhost:5173');
+                if (response.ok) {
+                    log(`✅ Frontend is running`, 'success');
+                    resultDiv.innerHTML += '<span class="status running">Frontend Running</span><br><br>';
+                } else {
+                    log(`❌ Frontend returned status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Frontend not accessible: ${error.message}`, 'error');
+                resultDiv.innerHTML += '<span class="status error">Frontend Offline</span><br><br>';
+                log('💡 Solution: Make sure frontend is running with "npm run dev" in frontend folder');
+            }
+            
+            log('');
+            log('✅ Test Complete!', 'success');
+            log('');
+            log('🌐 If all tests passed, open: http://localhost:5173', 'success');
+        }
+
+        async function fetchPets() {
+            clearResults();
+            log('🐾 Fetching pets from API...', 'info');
+            log('');
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/pets');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const pets = await response.json();
+                
+                log(`✅ Successfully fetched ${pets.length} pets!`, 'success');
+                log('');
+                
+                if (pets.length === 0) {
+                    log('⚠️ No pets found in database', 'error');
+                    log('💡 Run: cd backend && node seedData.js');
+                } else {
+                    pets.forEach((pet, index) => {
+                        resultDiv.innerHTML += `
+                            <div class="pet-card">
+                                <h3>${index + 1}. ${pet.name} 🐾</h3>
+                                <p><strong>Type:</strong> ${pet.type}</p>
+                                <p><strong>Breed:</strong> ${pet.breed}</p>
+                                <p><strong>Age:</strong> ${pet.age} years old</p>
+                                <p><strong>Gender:</strong> ${pet.gender}</p>
+                                <p><strong>Status:</strong> <span style="color: #059669">${pet.adoptionStatus}</span></p>
+                                <p><strong>Adoption Fee:</strong> $${pet.adoptionFee}</p>
+                                <p style="font-size: 12px; color: #6b7280;"><strong>ID:</strong> ${pet._id}</p>
+                            </div>
+                        `;
+                    });
+                }
+                
+            } catch (error) {
+                log(`❌ Failed to fetch pets: ${error.message}`, 'error');
+                log('');
+                log('🔧 Troubleshooting:', 'error');
+                log('1. Make sure backend is running: cd backend && npm run dev');
+                log('2. Check if MongoDB is running');
+                log('3. Verify backend is on http://localhost:5000');
+            }
+        }
+
+        // Auto-run test on page load
+        window.onload = () => {
+            log('🚀 Connection Test Page Loaded', 'success');
+            log('Click "Test Everything" to check your setup!');
+            log('');
+        };
+    </script>
+</body>
+</html>

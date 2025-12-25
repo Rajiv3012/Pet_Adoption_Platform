@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Demo Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: linear-gradient(135deg, #EC4899, #8B5CF6);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .info {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #0ea5e9;
+        }
+        .success {
+            background: #f0fdf4;
+            border-left-color: #22c55e;
+            color: #166534;
+        }
+        .error {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+            color: #991b1b;
+        }
+        .demo-badge {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Pet Adoption - Razorpay DEMO Test</h1>
+        
+        <div class="info demo-badge">
+            <h3>🎭 DEMO MODE ACTIVE</h3>
+            <p><strong>Backend URL:</strong> http://localhost:5000</p>
+            <p><strong>Test Amount:</strong> ₹100</p>
+            <p><strong>Status:</strong> Realistic demo simulation - no real payments</p>
+            <p><strong>Success Rate:</strong> ~90% (randomly simulated)</p>
+        </div>
+
+        <button class="btn" onclick="testCreateOrder()">1. Test Create Demo Order API</button>
+        <button class="btn" onclick="testFullDemoFlow()">2. Test Complete Demo Payment Flow</button>
+        <button class="btn" onclick="openDonationPage()">3. Open Donation Page (Recommended)</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div class="info ${type}"><pre>${message}</pre></div>`;
+        }
+
+        function openDonationPage() {
+            window.open('http://localhost:5174/donate', '_blank');
+            showResult('✅ Opening donation page in new tab...\n\nThis is the recommended way to test the demo!', 'success');
+        }
+
+        async function testCreateOrder() {
+            try {
+                showResult('Creating demo order...', 'info');
+                
+                const response = await fetch(`${API_BASE}/payments/create-order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: 100,
+                        currency: 'INR',
+                        receipt: `demo_test_${Date.now()}`,
+                        notes: {
+                            test: 'true',
+                            donor_name: 'Demo Test User'
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(`✅ Demo Order Created Successfully!\n\n${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResult(`❌ Demo Order Creation Failed!\n\n${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Network Error!\n\n${error.message}`, 'error');
+            }
+        }
+
+        async function testFullDemoFlow() {
+            try {
+                showResult('🎭 Starting complete demo payment flow...', 'info');
+                
+                // Step 1: Create demo order
+                const orderResponse = await fetch(`${API_BASE}/payments/create-order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: 100,
+                        currency: 'INR',
+                        receipt: `demo_full_test_${Date.now()}`,
+                        notes: {
+                            test: 'true',
+                            donor_name: 'Demo Test User',
+                            donor_email: 'demo@example.com'
+                        }
+                    })
+                });
+
+                const orderData = await orderResponse.json();
+                
+                if (!orderData.success) {
+                    throw new Error('Failed to create demo order');
+                }
+
+                showResult(`✅ Step 1: Demo order created\n\n${JSON.stringify(orderData, null, 2)}`, 'success');
+
+                // Step 2: Simulate payment success (in real demo, this would be done by the modal)
+                const demoPaymentResponse = {
+                    razorpay_order_id: orderData.order.id,
+                    razorpay_payment_id: `pay_demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    razorpay_signature: `demo_signature_${Date.now()}`
+                };
+
+                // Step 3: Verify demo payment
+                const verifyResponse = await fetch(`${API_BASE}/payments/verify-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...demoPaymentResponse,
+                        donation_details: {
+                            amount: 100,
+                            donation_type: 'one-time',
+                            donor_info: {
+                                name: 'Demo Test User',
+                                email: 'demo@example.com'
+                            }
+                        }
+                    })
+                });
+
+                const verifyData = await verifyResponse.json();
+                
+                if (verifyData.success) {
+                    showResult(`🎉 Complete Demo Flow Successful!\n\n📋 Order Details:\n${JSON.stringify(orderData, null, 2)}\n\n💳 Payment Response:\n${JSON.stringify(demoPaymentResponse, null, 2)}\n\n✅ Verification Result:\n${JSON.stringify(verifyData, null, 2)}`, 'success');
+                } else {
+                    showResult(`❌ Demo Payment Verification Failed!\n\n${JSON.stringify(verifyData, null, 2)}`, 'error');
+                }
+
+            } catch (error) {
+                showResult(`❌ Demo Flow Error!\n\n${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
