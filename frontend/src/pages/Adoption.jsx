@@ -37,63 +37,80 @@ export default function Adoption() {
   const currentPets = petsByType[selectedSpecies] || [];
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
+    <div className="w-full min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-rose-50">
       {/* HEADER */}
-      <section className="relative overflow-hidden pt-16 pb-20 bg-gradient-to-br from-pink-50 via-purple-50 to-white">
+      <section className="relative overflow-hidden pt-16 pb-20 bg-gradient-to-br from-pink-100 via-purple-100 to-rose-100">
         {/* Animated Background Elements */}
-        <div className="absolute -left-36 -top-24 w-72 h-72 bg-pink-200 rounded-full opacity-30 blur-3xl animate-pulse-slow"></div>
-        <div className="absolute right-[-40px] top-12 w-56 h-56 bg-purple-200 rounded-full opacity-30 blur-3xl animate-bounce-slow"></div>
-        <div className="absolute left-1/2 bottom-0 w-64 h-64 bg-rose-200 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -left-36 -top-24 w-96 h-96 bg-gradient-to-r from-pink-300 to-rose-300 rounded-full opacity-40 blur-3xl animate-pulse-slow"></div>
+        <div className="absolute right-[-40px] top-12 w-80 h-80 bg-gradient-to-l from-purple-300 to-pink-300 rounded-full opacity-40 blur-3xl animate-bounce-slow"></div>
+        <div className="absolute left-1/2 bottom-0 w-72 h-72 bg-gradient-to-t from-rose-300 to-pink-300 rounded-full opacity-30 blur-3xl"></div>
 
         {/* Floating Paw Prints */}
-        {[...Array(6)].map((_, i) => (
+        {[...Array(8)].map((_, i) => (
           <div
             key={i}
-            className="absolute opacity-10 animate-float-up"
+            className="absolute opacity-20 animate-float-up"
             style={{
-              left: `${10 + i * 15}%`,
-              top: `${20 + (i % 3) * 20}%`,
-              animationDelay: `${i * 0.5}s`,
-              fontSize: `${1 + (i % 2) * 0.5}rem`
+              left: `${5 + i * 12}%`,
+              top: `${15 + (i % 3) * 25}%`,
+              animationDelay: `${i * 0.4}s`,
+              fontSize: `${1.2 + (i % 2) * 0.6}rem`
             }}
           >
             🐾
           </div>
         ))}
 
+        {/* Floating Hearts */}
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute opacity-20 animate-bounce-gentle"
+            style={{
+              right: `${10 + i * 15}%`,
+              top: `${10 + (i % 2) * 30}%`,
+              animationDelay: `${i * 0.6}s`,
+              fontSize: `${1 + (i % 2) * 0.4}rem`
+            }}
+          >
+            💕
+          </div>
+        ))}
+
         <div className="max-w-screen-xl mx-auto px-6 lg:px-8 relative z-10">
           <div className="text-center space-y-6">
             {/* Main Heading with Gradient Animation */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-8xl font-black text-gray-900 leading-tight">
               <span className="inline-block animate-fade-in-up">Find</span>{' '}
-              <span className="inline-block animate-fade-in-up animation-delay-100">Your</span>{' '}
-              <span className="inline-block bg-gradient-to-r from-pink-600 via-purple-600 to-rose-600 bg-clip-text text-transparent animate-fade-in-up animation-delay-200 gradient-text-animated">
+              <span className="inline-block animate-fade-in-up animation-delay-100">Your</span>
+              <br className="md:hidden" />
+              <span className="inline-block bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 bg-clip-text text-transparent animate-fade-in-up animation-delay-200 gradient-text-animated text-6xl md:text-7xl lg:text-9xl">
                 Perfect
               </span>{' '}
-              <span className="inline-block bg-gradient-to-r from-pink-600 via-purple-600 to-rose-600 bg-clip-text text-transparent animate-fade-in-up animation-delay-300 gradient-text-animated">
+              <span className="inline-block bg-gradient-to-r from-purple-600 via-pink-500 to-rose-600 bg-clip-text text-transparent animate-fade-in-up animation-delay-300 gradient-text-animated text-6xl md:text-7xl lg:text-9xl">
                 Pet
               </span>
             </h1>
             
             {/* Subtitle with Fade In */}
-            <p className="mt-6 text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-400">
+            <p className="mt-8 text-xl md:text-2xl lg:text-3xl text-gray-700 max-w-4xl mx-auto leading-relaxed animate-fade-in-up animation-delay-400 font-semibold">
               Browse our loving companions and find your new{' '}
-              <span className="font-semibold text-pink-600">family member</span> today
+              <span className="font-black text-pink-600 text-2xl md:text-3xl lg:text-4xl">family member</span> today
             </p>
 
             {/* Stats Bar */}
-            <div className="flex flex-wrap justify-center gap-8 mt-8 animate-fade-in-up animation-delay-500">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-pink-600">{currentPets.length}+</div>
-                <div className="text-sm text-gray-600 font-medium">Available Pets</div>
+            <div className="flex flex-wrap justify-center gap-8 mt-10 animate-fade-in-up animation-delay-500">
+              <div className="text-center bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-110">
+                <div className="text-4xl font-black bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">{currentPets.length}+</div>
+                <div className="text-sm text-gray-700 font-bold mt-1">Available Pets</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600">100%</div>
-                <div className="text-sm text-gray-600 font-medium">Health Checked</div>
+              <div className="text-center bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-110">
+                <div className="text-4xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">100%</div>
+                <div className="text-sm text-gray-700 font-bold mt-1">Health Checked</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-rose-600">24/7</div>
-                <div className="text-sm text-gray-600 font-medium">Support</div>
+              <div className="text-center bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-110">
+                <div className="text-4xl font-black bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">24/7</div>
+                <div className="text-sm text-gray-700 font-bold mt-1">Support</div>
               </div>
             </div>
           </div>
@@ -101,24 +118,24 @@ export default function Adoption() {
       </section>
 
       {/* SPECIES FILTER */}
-      <section className="py-10 px-6 lg:px-8 bg-white border-b border-gray-100 sticky top-20 z-40 backdrop-blur-md bg-white/95">
+      <section className="py-10 px-6 lg:px-8 bg-gradient-to-r from-pink-100 via-white to-purple-100 border-b-4 border-pink-200 sticky top-20 z-40 backdrop-blur-md shadow-lg">
         <div className="max-w-screen-xl mx-auto">
           <div className="flex flex-wrap justify-center gap-4">
             {speciesCategories.map((species, index) => (
               <button
                 key={species.key}
                 onClick={() => setSelectedSpecies(species.key)}
-                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-110 ${
+                className={`px-8 py-4 rounded-2xl font-black text-lg transition-all duration-300 transform hover:scale-110 ${
                   selectedSpecies === species.key
-                    ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-rose-500 text-white shadow-2xl scale-110 animate-pulse-slow'
-                    : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-pink-50 hover:to-purple-50 hover:text-pink-600 shadow-md hover:shadow-lg'
+                    ? 'bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 text-white shadow-2xl scale-110 animate-pulse-slow'
+                    : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 hover:text-pink-600 shadow-md hover:shadow-xl border-2 border-pink-200 hover:border-pink-400'
                 }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <span className="mr-3 text-2xl inline-block transform transition-transform duration-300 hover:scale-125">
+                <span className="mr-3 text-3xl inline-block transform transition-transform duration-300 hover:scale-125 hover:rotate-12">
                   {species.icon}
                 </span>
-                <span className="font-extrabold">{species.label}</span>
+                <span className="font-extrabold tracking-wide">{species.label}</span>
               </button>
             ))}
           </div>
@@ -126,23 +143,23 @@ export default function Adoption() {
       </section>
 
       {/* PETS GRID */}
-      <section className="py-16 px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-16 px-6 lg:px-8 bg-gradient-to-br from-pink-50 via-white to-purple-50">
         <div className="max-w-screen-xl mx-auto">
           <div className="mb-12 text-center">
             <div className="inline-flex items-center gap-4 mb-4">
-              <span className="text-5xl animate-bounce-gentle">
+              <span className="text-6xl animate-bounce-gentle">
                 {speciesCategories.find(s => s.key === selectedSpecies)?.icon}
               </span>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900">
+              <h2 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-rose-600 bg-clip-text text-transparent">
                 {speciesCategories.find(s => s.key === selectedSpecies)?.label}
               </h2>
             </div>
-            <div className="flex items-center justify-center gap-3 mt-4">
-              <div className="h-1 w-20 bg-gradient-to-r from-transparent via-pink-500 to-transparent rounded-full"></div>
-              <p className="text-lg text-gray-600 font-semibold">
-                <span className="text-2xl font-bold text-pink-600">{currentPets.length}</span> pets available for adoption
+            <div className="flex items-center justify-center gap-3 mt-6">
+              <div className="h-1 w-24 bg-gradient-to-r from-transparent via-pink-500 to-transparent rounded-full"></div>
+              <p className="text-xl text-gray-700 font-bold">
+                <span className="text-3xl font-black bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">{currentPets.length}</span> pets available for adoption
               </p>
-              <div className="h-1 w-20 bg-gradient-to-r from-transparent via-pink-500 to-transparent rounded-full"></div>
+              <div className="h-1 w-24 bg-gradient-to-r from-transparent via-pink-500 to-transparent rounded-full"></div>
             </div>
           </div>
 
