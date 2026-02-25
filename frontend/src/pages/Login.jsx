@@ -81,9 +81,13 @@ export default function Login() {
   const handleGoogleSignIn = () => {
     setIsGoogleLoading(true);
     
+    // Get backend URL from environment variable
+    const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    const baseUrl = backendUrl.replace('/api', ''); // Remove /api suffix if present
+    
     // Open Google OAuth in popup with account selection forced
     const popup = window.open(
-      "http://localhost:5000/api/auth/google?prompt=select_account",
+      `${baseUrl}/api/auth/google?prompt=select_account`,
       "googleAuth",
       "width=500,height=600,scrollbars=yes,resizable=yes"
     );
