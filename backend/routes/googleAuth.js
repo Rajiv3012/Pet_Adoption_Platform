@@ -60,10 +60,13 @@ router.get(
         profilePicture: user.profilePicture
       }));
 
-      res.redirect(`http://localhost:5174/auth/callback?token=${token}&user=${userData}`);
+      // Use environment variable for frontend URL
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5174";
+      res.redirect(`${frontendUrl}/auth/callback?token=${token}&user=${userData}`);
     } catch (error) {
       console.error("Google OAuth callback error:", error);
-      res.redirect("http://localhost:5174/login?error=oauth_failed");
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5174";
+      res.redirect(`${frontendUrl}/login?error=oauth_failed`);
     }
   }
 );
