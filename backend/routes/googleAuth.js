@@ -19,24 +19,30 @@ router.get(
   }
 );
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { session: false }),
-  async (req, res) => {
+router.get("/google/callback", (req, res, next) => {
+  const frontendUrl = process.env.FRONTEND_URL;
+  if (!frontendUrl) {
+    return res.status(500).json({ msg: "FRONTEND_URL is not configured" });
+  }
+
+  passport.authenticate("google", { session: false }, async (err, profile) => {
+    if (err || !profile) {
+      const reason = encodeURIComponent(err?.message || "oauth_callback_failed");
+      return res.redirect(`${frontendUrl}/login?error=${reason}`);
+    }
+
     try {
-      const profile = req.user;
-      
       // Check if user exists
       let user = await User.findOne({ email: profile.emails[0].value });
 
       if (!user) {
         // Create new user from Google data
         user = await User.create({
-          name: profile.displayName || profile.emails[0].value.split('@')[0],
+          name: profile.displayName || profile.emails[0].value.split("@")[0],
           email: profile.emails[0].value,
-          password: await bcrypt.hash(Math.random().toString(36), 10), // Random password for Google users
+          password: await bcrypt.hash(Math.random().toString(36), 10),
           googleId: profile.id,
-          profilePicture: profile.photos[0]?.value
+          profilePicture: profile.photos[0]?.value,
         });
       } else if (!user.googleId) {
         // Link Google account to existing user
@@ -45,30 +51,25 @@ router.get(
         await user.save();
       }
 
-      // Generate JWT token
-      const token = jwt.sign(
-        { id: user._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d" }
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      const userData = encodeURIComponent(
+        JSON.stringify({
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          profilePicture: user.profilePicture,
+        })
       );
 
-      // Redirect to frontend with token and user data
-      const userData = encodeURIComponent(JSON.stringify({
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        profilePicture: user.profilePicture
-      }));
-
-      // Use environment variable for frontend URL
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5174";
-      res.redirect(`${frontendUrl}/auth/callback?token=${token}&user=${userData}`);
+      return res.redirect(`${frontendUrl}/auth/callback?token=${token}&user=${userData}`);
     } catch (error) {
       console.error("Google OAuth callback error:", error);
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5174";
-      res.redirect(`${frontendUrl}/login?error=oauth_failed`);
+      return res.redirect(`${frontendUrl}/login?error=oauth_failed`);
     }
-  }
-);
+  })(req, res, next);
+});
 
 export default router;
