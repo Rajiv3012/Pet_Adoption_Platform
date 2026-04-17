@@ -3,7 +3,7 @@
 ## Your Google OAuth Credentials
 ```
 Client ID: 719670600296-76c0j82pt0b2ijmekh6js4e89jh1llea.apps.googleusercontent.com
-Client Secret: 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t
+Client Secret: [REDACTED - rotate and set via environment variables]
 ```
 
 ## ⚠️ CRITICAL: Google Cloud Console Configuration
@@ -44,7 +44,7 @@ Add these variables:
 
 ```env
 GOOGLE_CLIENT_ID=719670600296-76c0j82pt0b2ijmekh6js4e89jh1llea.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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t
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 GOOGLE_CALLBACK_URL=https://pet-adoption-platform-pkhw.onrender.com/api/auth/google/callback
 ```
 

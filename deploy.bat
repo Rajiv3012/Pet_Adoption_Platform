@@ -2,7 +2,7 @@
 echo 🚀 Pet Haven Deployment Script - Render Edition
 echo ================================================
 echo.
-
+//db pass -> pethaven@123
 echo What would you like to deploy?
 echo 1) Frontend only (Vercel)
 echo 2) Backend only (Manual Render setup)
