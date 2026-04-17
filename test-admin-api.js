@@ -1,14 +1,19 @@
 import axios from 'axios';
 
+const API_BASE_URL = process.env.API_BASE_URL || 'https://pet-adoption-platform-1-s9bq.onrender.com/api';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@petadoption.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
 async function testAdminAPI() {
   try {
     console.log('🧪 Testing Admin API...');
+    console.log('🌐 API Base URL:', API_BASE_URL);
     
     // Step 1: Login as admin
     console.log('1. Logging in as admin...');
-    const loginResponse = await axios.post('http://localhost:5000/api/auth/login', {
-      email: 'admin@pethaven.com',
-      password: 'admin123'
+    const loginResponse = await axios.post(`${API_BASE_URL}/auth/login`, {
+      email: ADMIN_EMAIL,
+      password: ADMIN_PASSWORD
     });
     
     const token = loginResponse.data.token;
@@ -19,7 +24,7 @@ async function testAdminAPI() {
     
     // Step 2: Test admin stats endpoint
     console.log('\n2. Testing admin stats endpoint...');
-    const statsResponse = await axios.get('http://localhost:5000/api/admin/stats', {
+    const statsResponse = await axios.get(`${API_BASE_URL}/admin/stats`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -30,7 +35,7 @@ async function testAdminAPI() {
     
     // Step 3: Test admin shelters endpoint
     console.log('\n3. Testing admin shelters endpoint...');
-    const sheltersResponse = await axios.get('http://localhost:5000/api/admin/shelters', {
+    const sheltersResponse = await axios.get(`${API_BASE_URL}/admin/shelters`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
