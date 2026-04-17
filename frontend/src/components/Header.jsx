@@ -80,7 +80,6 @@ export default function Header({ onDonateClick }) {
 
   // navigation items
   const navItems = [
-    { label: "Pet Haven", to: "/" },
     { label: "Home", to: "/" },
     { label: "Adopt", to: "/pets" },
     { label: "Donate", to: "/donate" },
@@ -114,9 +113,9 @@ export default function Header({ onDonateClick }) {
           </div>
 
           {/* Center nav links (desktop) - expanded to fill space */}
-          <div className="hidden lg:flex lg:items-center lg:justify-center flex-1 gap-8">
+          <div className="hidden lg:flex lg:items-center lg:justify-center flex-1 gap-6 xl:gap-8">
               {navItems.map((item) => (
-                <Link key={item.label} to={item.to} className="px-4 py-2 text-gray-700 hover:text-gray-900 border-b-2 border-transparent hover:border-pink-400 transition font-medium">{item.label}</Link>
+                <Link key={item.label} to={item.to} className="px-3 xl:px-4 py-2 text-gray-700 hover:text-gray-900 border-b-2 border-transparent hover:border-pink-400 transition font-medium whitespace-nowrap">{item.label}</Link>
               ))}
             </div>
 
