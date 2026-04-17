@@ -82,7 +82,9 @@ export default function Login() {
     setIsGoogleLoading(true);
     
     // Get backend URL from environment variable
-    const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    const backendUrl =
+      import.meta.env.VITE_API_URL ||
+      "https://pet-adoption-platform-1-s9bq.onrender.com/api";
     const baseUrl = backendUrl.replace('/api', ''); // Remove /api suffix if present
     
     // Open Google OAuth in popup with account selection forced
